@@ -7,24 +7,111 @@ class EstudentsController {
     }
 
     read(req, res) {
-        res.json({ msg: 'Get students' });
+        try {
+            db.query(
+                `SELECT * FROM students`,
+                (err, rows) => {
+                    if (err) {
+                        res.status(400).send(err);
+                    }
+
+                    res.status(200).json(rows);
+                }
+            )
+        } catch (error) {
+            res.status(500).send(err.message);
+        }
     }
 
     readDetail(req, res) {
         const { id } = req.params;
-        res.json({ msg: `Get student ${id}` });
+
+        try {
+            db.query(
+                `SELECT * FROM students WHERE id = ?`,
+                [id],
+                (err, rows) => {
+                    if (err) {
+                        res.status(400).send(err);
+                    }
+
+                    res.status(200).json(rows[0]);
+                }
+            )
+        } catch (error) {
+            res.status(500).send(err.message);
+        }
     }
 
     create(req, res) {
-        res.json({ msg: 'Add student' });
+        try {
+
+            const { dni, first_name, last_name, email, phone } = req.body;
+
+            db.query(
+                `INSERT INTO students
+                (id, dni, first_name, last_name, email, phone)
+                VALUES(NULL, ?, ?, ?, ?, ?);`,
+                [dni, first_name, last_name, email, phone],
+                (err, rows) => {
+                    if (err) {
+                        res.status(400).send(err);
+                    }
+
+                    res.status(201).json({ id: rows.insertId });
+                }
+            )
+        } catch (error) {
+            res.status(500).send(err.message);
+        }
     }
 
     update(req, res) {
-        res.json({ msg: 'Update student' });
+
+        const { id } = req.params;
+
+        try {
+            const { dni, first_name, last_name, email, phone } = req.body;
+
+            db.query(
+                `UPDATE students
+                SET dni = ?, first_name = ?, last_name = ?, email = ?, phone = ?
+                WHERE id = ?;`,
+                [dni, first_name, last_name, email, phone, id],
+                (err, rows) => {
+                    if (err) {
+                        res.status(400).send(err);
+                    }
+                    if (rows.affectedRows == 1)
+                    res.status(200).json({Response: `Student ${id} successfully updated!!`});
+                }
+            )
+        } catch (error) {
+            res.status(500).send(err.message);
+        }
+
     }
 
     deleteStudent(req, res) {
-        res.json({ msg: 'Delete student' });
+        const { id } = req.params;
+
+        try {
+
+            db.query(
+                `DELETE FROM students
+                WHERE id = ?;`,
+                [id],
+                (err, rows) => {
+                    if (err) {
+                        res.status(400).send(err);
+                    }
+                    if (rows.affectedRows == 1)
+                    res.status(200).json({Response: `Student ${id} successfully deleted!!`});
+                }
+            )
+        } catch (error) {
+            res.status(500).send(err.message);
+        }
     }
 }
 
