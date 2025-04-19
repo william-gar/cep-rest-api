@@ -32,14 +32,18 @@ class EstudentsController {
                 [id],
                 (err, rows) => {
                     if (err) {
-                        res.status(400).send(err);
+                        return res.status(400).send({ error: err.message });
+                    }
+
+                    if (rows.length === 0) {
+                        return res.status(404).json({ message: `Estudent with ID: ${id} not found !!` });
                     }
 
                     res.status(200).json(rows[0]);
                 }
             )
         } catch (error) {
-            res.status(500).send(err.message);
+            res.status(500).send({ error: error.message });
         }
     }
 
@@ -83,7 +87,7 @@ class EstudentsController {
                         res.status(400).send(err);
                     }
                     if (rows.affectedRows == 1)
-                    res.status(200).json({Response: `Student ${id} successfully updated!!`});
+                        res.status(200).json({ Response: `Student ${id} successfully updated!!` });
                 }
             )
         } catch (error) {
@@ -106,7 +110,7 @@ class EstudentsController {
                         res.status(400).send(err);
                     }
                     if (rows.affectedRows == 1)
-                    res.status(200).json({Response: `Student ${id} successfully deleted!!`});
+                        res.status(200).json({ Response: `Student ${id} successfully deleted!!` });
                 }
             )
         } catch (error) {
